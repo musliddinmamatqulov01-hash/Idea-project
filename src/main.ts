@@ -54,4 +54,8 @@ async function bootstrap(): Promise<void> {
   console.log(`VentureMarket backend listening on port ${port}`);
 }
 
-bootstrap();
+bootstrap().catch((error: unknown) => {
+  // eslint-disable-next-line no-console
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});
