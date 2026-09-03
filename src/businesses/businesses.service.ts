@@ -121,7 +121,9 @@ export class BusinessesService {
     return {
       ...business,
       listing: business.listing ? this.serializeListing(business.listing) : business.listing,
-      metrics: business.metrics ? business.metrics.map((m: any) => this.serializeMetric(m)) : undefined,
+      metrics: business.metrics
+        ? business.metrics.map((m: any) => this.serializeMetric(m))
+        : undefined,
     };
   }
 
@@ -129,7 +131,8 @@ export class BusinessesService {
   private serializeListing(listing: any) {
     return {
       ...listing,
-      askingPrice: listing.askingPriceMinor !== null ? toMajorUnits(listing.askingPriceMinor) : null,
+      askingPrice:
+        listing.askingPriceMinor !== null ? toMajorUnits(listing.askingPriceMinor) : null,
       askingPriceMinor: undefined,
     };
   }

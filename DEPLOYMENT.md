@@ -26,7 +26,7 @@ npm run prisma:migrate:deploy   # apply migrations — no interactive prompts, s
 node dist/main.js
 ```
 
-The multi-stage `Dockerfile` builds a minimal production image (`node:20-alpine`, `npm prune --omit=dev`,
+The multi-stage `Dockerfile` builds a minimal production image (`node:22-alpine`, `npm prune --omit=dev`,
 runs as the non-root `node` user).
 
 ## Required infrastructure

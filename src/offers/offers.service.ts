@@ -139,7 +139,11 @@ export class OffersService {
       amount: toMajorUnits(offer.amountMinor),
       amountMinor: undefined,
       revisions: offer.revisions
-        ? offer.revisions.map((r: any) => ({ ...r, amount: toMajorUnits(r.amountMinor), amountMinor: undefined }))
+        ? offer.revisions.map((r: any) => ({
+            ...r,
+            amount: toMajorUnits(r.amountMinor),
+            amountMinor: undefined,
+          }))
         : undefined,
     };
   }
