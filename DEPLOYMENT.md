@@ -52,6 +52,28 @@ See `.env.example` for the full list with inline documentation. The app validate
 startup (`src/config/env.validation.ts`) and **refuses to boot** if any required variable is missing
 or malformed — this is intentional; do not work around it by making validation lenient.
 
+### Render: required variables
+
+None of these have a default — the app will not boot without them. Render does not read `.env`;
+set these under **Environment → Environment Variables** on the web service. Use Render's "Generate"
+option for the three `*_SECRET` values.
+
+| Variable | Secret? | Notes |
+|---|---|---|
+| `DATABASE_URL` | yes | Render PostgreSQL connection string (Internal URL if the DB is on the same Render account/region) |
+| `REDIS_URL` | yes | required eagerly at boot — `QueueModule` (BullMQ, `src/jobs/queue.module.ts`) connects on startup, not lazily |
+| `APP_URL` | no | base URL used to build the **frontend** links sent in verification/reset emails (`${APP_URL}/auth/verify-email?token=...`) — set this to the frontend's URL, not the backend's own Render URL |
+| `FRONTEND_URL` | no | used for CORS `origin` (`src/main.ts`) — must exactly match the deployed frontend's origin |
+| `JWT_SECRET` | yes | signs access tokens (`JwtModule`, `JwtStrategy`) — min 16 chars |
+| `JWT_REFRESH_SECRET` | yes | validated at boot but not currently used to sign anything — refresh tokens are opaque, DB-hashed (`src/auth/token.service.ts`), not JWTs. Still required by the schema; use a distinct strong value |
+| `COOKIE_SECRET` | yes | signs the `access_token`/`refresh_token` cookies (`cookie-parser`, `src/main.ts`) — min 16 chars |
+| `STORAGE_ENDPOINT` | no | S3-compatible endpoint (`StorageService`, `@aws-sdk/client-s3`) — any provider works: AWS S3, Cloudflare R2, MinIO, etc. |
+| `STORAGE_BUCKET` | no | bucket name, must already exist and not be publicly readable |
+| `STORAGE_ACCESS_KEY` / `STORAGE_SECRET_KEY` | yes | credentials for the bucket above |
+
+`PORT` is provided automatically by Render — do not set it manually; the app already reads
+`process.env.PORT` (default `3000`) via `src/main.ts`.
+
 ## Health checks
 
 - `GET /api/v1/health` — liveness (process is up)
