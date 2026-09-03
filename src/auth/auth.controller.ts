@@ -155,17 +155,24 @@ export class AuthController {
     const authConfig = this.configService.get('auth', { infer: true });
     const isProd = this.configService.get('nodeEnv', { infer: true }) === 'production';
 
+    // 'none' is required in production because the frontend is deployed on a
+    // different domain than this API — SameSite=Lax cookies are not sent on
+    // cross-site fetch/XHR, only on top-level navigation, which would silently
+    // break every authenticated request. 'none' requires Secure, which is why
+    // this is gated to production (isProd === secure here).
+    const sameSite = isProd ? ('none' as const) : ('lax' as const);
+
     res.cookie(ACCESS_COOKIE, tokens.accessToken, {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'lax',
+      sameSite,
       maxAge: parseDurationMs(authConfig.jwtAccessTtl),
       path: '/',
     });
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'lax',
+      sameSite,
       maxAge: tokens.refreshTokenExpiresAt.getTime() - Date.now(),
       path: '/api/v1/auth',
     });
